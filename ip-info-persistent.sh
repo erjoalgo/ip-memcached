@@ -1,4 +1,19 @@
-#!/bin/bash -x
+#!/bin/bash
+
+while getopts "vhx" OPT; do
+    case ${OPT} in
+	v)
+	    VERBOSE=true
+	    ;;
+	x)
+	    set -x
+	    ;;
+	h)
+	    less ${0}
+	    exit 0
+	esac
+done
+
 
 HOST=${HOST:-"127.0.0.1"}
 PORT=${PORT:-"21201"}
@@ -16,8 +31,8 @@ if test -z "${API_KEY}"; then
 fi
 PRE_URL="http://api.ipinfodb.com/v3/ip-city/?key=${API_KEY}"
 
-# VERBOSE=true
-VERBOSE=false
+VERBOSE=${VERBOSE:-false}
+
 
 function test_port	{
     HOST="${1}"
@@ -39,54 +54,54 @@ function maybe_start_or_install	{
     fi
 }
 
-function sendmemcached	{
-    echo -en "${1}\r\n" | nc "${HOST}" "${PORT}" -w 1
+function memcached_send	{
+    echo -en "${1}\r\n" | nc "${HOST}" "${PORT}" -q 1
 }
 
-function memset	{
+function ip_set	{
     KEY="${1}"
     VAL="${2}"
     LEN="${#VAL}"
-    sendmemcached "set ${KEY} 0 0 ${LEN}\r\n${VAL}"
-    # sendmemcached 
+    memcached_send "set ${KEY} 0 0 ${LEN}\r\n${VAL}"
+    # memcached_send 
 }
-function memget	{
-       sendmemcached "get $*" | grep -v '^\(VALUE\|END\)'
-       # sendmemcached "get $*"
+function ip_get_cache	{
+       memcached_send "get $*" | grep -v '^\(VALUE\|END\)'
+       # memcached_send "get $*"
 }
 
 
-function ipdb_get	{
+function ip_get_network	{
     IP="${1}"
-    if test "${VERBOSE}" = true; then
-	echo "CACHE MISS. MAKING NETWORK REQUEST" >&2
-    fi
     URL="${PRE_URL}&ip=${IP}"
     RESP=$(curl -s "${URL}")
     echo "${RESP}"
 }
 function ipdb_get_set	{
     IP="${1}"
-    RESP=$(ipdb_get ${IP})
-    memset "${IP}" "${RESP}"
+    RESP=$(ip_get_network ${IP})
+    ip_set "${IP}" "${RESP}"
 }
 
-function get_ip	{
+function ip_get	{
     IP="${1}"
-    RESP=$(memget ${IP})
+    RESP=$(ip_get_cache ${IP})
     if test -z "${RESP}"; then
-	RESP=$(ipdb_get ${IP})
-	memset "${IP}" "${RESP}"
-    elif test "${VERBOSE}" = true; then
-	echo "CACHE HIT" >&2
+	test "${VERBOSE}" = true && echo "CACHE MISS. MAKING NETWORK REQUEST" >&2
+	RESP=$(ip_get_network ${IP})
+	ip_set "${IP}" "${RESP}"
+    else
+	test "${VERBOSE}" = true && echo "CACHE HIT" >&2
     fi
     echo "${RESP}"
 }
 
     
 maybe_start_or_install
+
+# http://stackoverflow.com/questions/31218391/read-line-by-line-from-standard-input-bash
 while IFS='$\n' read -r IP; do
-    echo $(get_ip "${IP}")
+    echo $(ip_get "${IP}")
 done
 
 # maybe_start_or_install
@@ -95,7 +110,7 @@ done
 
 # memcachedb -H /tmp/caca.db -l localhost -V
 # sudo memcachedb -H /var/log/ip.db -l localhost -u root -d
-# memset 45.55.140.195 "PRUEBA"
+# ip_set 45.55.140.195 "PRUEBA"
 # ipdb_get 45.55.140.195
 
 
