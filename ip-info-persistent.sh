@@ -2,11 +2,11 @@
 
 HOST=${HOST:-"127.0.0.1"}
 PORT=${PORT:-"21201"}
+LOGFN="/var/log/ip-memcachedb.db"
 
-MEMCACHEDB_CMD="sudo memcachedb -H /var/log/ip.db -l ${HOST} -u root -d -p ${PORT}"
+MEMCACHEDB_CMD="sudo memcachedb -H ${LOGFN} -l ${HOST} -u root -d -p ${PORT}"
 SELFD=$(readlink -f $(pwd))
 API_KEY_FN="${SELFD}/api-key"
-exit
 API_KEY=$(cat "${API_KEY_FN}")
 
 if test -z "${API_KEY}"; then
