@@ -2,9 +2,10 @@
 
 HOST=${HOST:-"127.0.0.1"}
 PORT=${PORT:-"21201"}
-LOGFN="/var/log/ip-memcachedb.db"
 
+LOGFN="/var/log/ip-memcachedb.db"
 MEMCACHEDB_CMD="sudo memcachedb -H ${LOGFN} -l ${HOST} -u root -d -p ${PORT}"
+
 SELFD=$(readlink -f $(pwd))
 API_KEY_FN="${SELFD}/api-key"
 API_KEY=$(cat "${API_KEY_FN}")
@@ -94,11 +95,11 @@ done
 
 # memcachedb -H /tmp/caca.db -l localhost -V
 # sudo memcachedb -H /var/log/ip.db -l localhost -u root -d
-# memset 162.228.201.6 "CACA"
-# ipdb_get 162.228.201.6
+# memset 45.55.140.195 "PRUEBA"
+# ipdb_get 45.55.140.195
 
 
 # Local Variables:
-# compile-cmd: "echo 162.228.201.6 | ip-info-persistent.sh "
+# compile-cmd: "echo 45.55.140.195 | ip-info-persistent.sh "
 # End:
 
