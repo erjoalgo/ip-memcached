@@ -1,11 +1,12 @@
 A self contained cli utility to query api.ipinfodb.com and provide IP info.
 
-$ echo 45.55.140.195 | ./ip-info-persistent.sh
+    ln -s $(pwd)/ip-info-persistent.sh ~/bin/
 
+    $ echo 45.55.140.195 | ip-info-persistent.sh
     OK;;45.55.140.195;US;United States;New York;New York City;10013;40.7199;-74.005;-04:00
     
-$ grep -Po '^[0-9.]+'  /var/log/nginx/my-site.log | sort | uniq | ip-info-persistent.sh
-    
+    $ grep -Po '^[0-9.]+'  /var/log/nginx/my-site.log | sort | uniq | ip-info-persistent.sh
+        
     OK;;1.169.77.189;TW;Taiwan, Province of China;T'ai-wan;Taipei;10048;25.0478;121.532;+08:00
     OK;;1.32.77.43;MY;Malaysia;Selangor;Seri Kembangan;43300;3.03333;101.717;+08:00
     OK;;101.109.151.109;TH;Thailand;Chon Buri;Phatthaya;76130;12.9333;100.883;+07:00
