@@ -1,6 +1,6 @@
 #!/bin/bash
 
-while getopts "vhx" OPT; do
+while getopts "vhxs:" OPT; do
     case ${OPT} in
 	v)
 	    VERBOSE=true
@@ -8,6 +8,10 @@ while getopts "vhx" OPT; do
 	x)
 	    set -x
 	    ;;
+	s)
+	    SLEEP_SECS=${OPTARG}
+	    ;;
+
 	h)
 	    less ${0}
 	    exit 0
@@ -17,11 +21,13 @@ done
 
 HOST=${HOST:-"127.0.0.1"}
 PORT=${PORT:-"21201"}
+SLEEP_SECS=${SLEEP_SECS:-.9}
 
 LOGFN="/var/log/ip-memcachedb.db"
 MEMCACHEDB_CMD="sudo memcachedb -H ${LOGFN} -l ${HOST} -u root -d -p ${PORT}"
 
-SELFD=$(readlink -f $(pwd))
+#SELFD=$(readlink -f $(pwd))
+SELFD=$(dirname $(readlink -f $0))
 API_KEY_FN="${SELFD}/api-key"
 API_KEY=$(cat "${API_KEY_FN}")
 
@@ -75,6 +81,9 @@ function ip_get_network	{
     IP="${1}"
     URL="${PRE_URL}&ip=${IP}"
     RESP=$(curl -s "${URL}")
+    if ! test ${SLEEP_SECS} = 0; then
+	sleep ${SLEEP_SECS}
+    fi
     echo "${RESP}"
 }
 function ipdb_get_set	{
@@ -91,7 +100,8 @@ function ip_get	{
 	RESP=$(ip_get_network ${IP})
 	ip_set "${IP}" "${RESP}"
     else
-	test "${VERBOSE}" = true && echo "CACHE HIT" >&2
+	#test "${VERBOSE}" = true && echo "CACHE HIT" >&2
+	true
     fi
     echo "${RESP}"
 }
