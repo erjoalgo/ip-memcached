@@ -52,12 +52,12 @@ type IpInfo struct {
 var skipCache bool
 var verbose bool
 var debug bool
-var mc = memcache.New("localhost:11211")
+var mc *memcache.Client
 
 func ipInfo(ip string) (info IpInfo, err error) {
 	// http://ip-api.com/json/208.80.152.201
 	var body []byte
-	if !skipCache {
+	if !skipCache && mc != nil {
 		if it, err := mc.Get(ip); err == nil {
 			if verbose {
 				log.Printf("cache hit for %s\n", ip)
@@ -75,7 +75,9 @@ func ipInfo(ip string) (info IpInfo, err error) {
 			if debug {
 				log.Printf("response is %s", body)
 			}
-			mc.Set(&memcache.Item{Key: ip, Value: body})
+			if mc != nil {
+				mc.Set(&memcache.Item{Key: ip, Value: body})
+			}
 		}
 		// sleep to avoid getting banned
 		time.Sleep(1 * time.Second)
@@ -93,7 +95,11 @@ func main() {
 	flag.BoolVar(&skipCache, "skipCache", false, "skip memcachedb")
 	flag.BoolVar(&verbose, "verbose", false, "verbose")
 	flag.BoolVar(&debug, "debug", false, "debug")
+	var mcPort int
+	flag.IntVar(&mcPort, "mcPort", 21201, "memcachedb port")
 	flag.Parse()
+
+	mc = memcache.New(fmt.Sprintf("127.0.0.1:%d", mcPort))
 
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
