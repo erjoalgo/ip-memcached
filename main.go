@@ -99,7 +99,11 @@ func main() {
 	flag.IntVar(&mcPort, "mcPort", 21201, "memcachedb port")
 	flag.Parse()
 
-	mc = memcache.New(fmt.Sprintf("127.0.0.1:%d", mcPort))
+	mcaddr := fmt.Sprintf("127.0.0.1:%d", mcPort)
+	mc = memcache.New(mcaddr)
+	if debug {
+		fmt.Printf("mc server addr: %s\n", mcaddr)
+	}
 
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
