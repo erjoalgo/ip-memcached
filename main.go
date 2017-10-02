@@ -49,12 +49,17 @@ type IpInfo struct {
 }
 
 var skipCache bool
+var verbose bool
+var debug bool
 
 func ipInfo(ip string) (info IpInfo, err error) {
 	// http://ip-api.com/json/208.80.152.201
 	var body []byte
 	if !skipCache {
 		if it, err := mc.Get(ip); err == nil {
+			if verbose {
+				log.Printf("cache hit for %s\n", ip)
+			}
 			body = it.Value
 		}
 	}
@@ -65,6 +70,9 @@ func ipInfo(ip string) (info IpInfo, err error) {
 		} else if body, err := ioutil.ReadAll(resp.Body); err != nil {
 			return info, fmt.Errorf("failed to read resp body: %s", err)
 		} else {
+			if debug {
+				log.Printf("response is %s", body)
+			}
 			mc.Set(&memcache.Item{Key: ip, Value: body})
 		}
 	}
@@ -81,6 +89,8 @@ var mc = memcache.New("localhost:11211")
 func main() {
 	// mc := memcache.New("10.0.0.1:11211", "10.0.0.2:11211", "10.0.0.3:11212")
 	flag.BoolVar(&skipCache, "skipCache", false, "skip memcachedb")
+	flag.BoolVar(&verbose, "verbose", false, "verbose")
+	flag.BoolVar(&debug, "debug", false, "debug")
 	flag.Parse()
 
 	scanner := bufio.NewScanner(os.Stdin)

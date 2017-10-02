@@ -9,6 +9,8 @@ import (
 
 func TestIp(t *testing.T) {
 	skipCache = true
+	verbose = true
+	debug = true
 	if info, err := ipInfo("45.55.140.195"); err != nil {
 		log.Fatal("error getting info: %s", err)
 	} else {
