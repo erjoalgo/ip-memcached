@@ -63,8 +63,9 @@ func ipInfo(ip string) (info IpInfo, err error) {
 				log.Printf("cache hit for %s\n", ip)
 			}
 			body = it.Value
-		} else if debug {
-			log.Printf("memcached error: %s", err)
+			// } else if _, ok := err.(*memcache.ErrCacheMiss); !ok {
+		} else if err == memcache.ErrCacheMiss {
+			log.Printf("memcached non-cache miss error: %s", err)
 		}
 	}
 
@@ -78,7 +79,9 @@ func ipInfo(ip string) (info IpInfo, err error) {
 				log.Printf("response is %s", body)
 			}
 			if mc != nil {
-				mc.Set(&memcache.Item{Key: ip, Value: body})
+				if err := mc.Set(&memcache.Item{Key: ip, Value: body}); err != nil {
+					log.Printf("memcached error: %s", err)
+				}
 			}
 		}
 		// sleep to avoid getting banned
