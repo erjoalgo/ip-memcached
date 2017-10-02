@@ -68,7 +68,7 @@ func ipInfo(ip string) (info IpInfo, err error) {
 	if body == nil {
 		if resp, err := http.Get("http://ip-api.com/json/" + ip); err != nil {
 			return info, fmt.Errorf("failed to fetch ip info: %s", err)
-		} else if body, err := ioutil.ReadAll(resp.Body); err != nil {
+		} else if body, err = ioutil.ReadAll(resp.Body); err != nil {
 			return info, fmt.Errorf("failed to read resp body: %s", err)
 		} else {
 			if debug {
