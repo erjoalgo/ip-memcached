@@ -98,6 +98,8 @@ func main() {
 	flag.BoolVar(&verbose, "verbose", false, "verbose")
 	flag.BoolVar(&debug, "debug", false, "debug")
 	var mcPort int
+	// var count bool
+	// flag.BoolVar(&count, "count", false, "count")
 	flag.IntVar(&mcPort, "mcPort", 11211, "memcachedb port")
 	flag.Parse()
 
@@ -108,12 +110,16 @@ func main() {
 	}
 
 	scanner := bufio.NewScanner(os.Stdin)
+	counts := make(map[string]int)
 	for scanner.Scan() {
 		ip := scanner.Text()
+		counts[ip] += 1
+	}
+	for ip, cnt := range counts {
 		if info, err := ipInfo(ip); err != nil {
 			log.Fatal("error getting info for %s: %s", ip, err)
 		} else {
-			fmt.Printf("%s\n", info)
+			fmt.Printf("%d: %s\n", cnt, info)
 		}
 	}
 }
