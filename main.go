@@ -52,6 +52,7 @@ type IpInfo struct {
 var skipCache bool
 var verbose bool
 var debug bool
+var mc = memcache.New("localhost:11211")
 
 func ipInfo(ip string) (info IpInfo, err error) {
 	// http://ip-api.com/json/208.80.152.201
@@ -86,8 +87,6 @@ func ipInfo(ip string) (info IpInfo, err error) {
 		return info, nil
 	}
 }
-
-var mc = memcache.New("localhost:11211")
 
 func main() {
 	// mc := memcache.New("10.0.0.1:11211", "10.0.0.2:11211", "10.0.0.3:11212")
