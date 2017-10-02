@@ -8,6 +8,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/bradfitz/gomemcache/memcache"
 )
 
 var example = `
@@ -45,27 +47,37 @@ type IpInfo struct {
 	Query       string // "208.80.152.201"
 }
 
-func ipInfo(ip string) (info IpInfo) {
+func ipInfo(ip string) (info IpInfo, err error) {
 	// http://ip-api.com/json/208.80.152.201
-	if resp, err := http.Get("http://ip-api.com/json/" + ip); err != nil {
-		log.Fatal("falied to fetch ip info: %s %s", ip, err)
+	var body []byte
+	if it, err := mc.Get(ip); err == nil {
+		// log.Printf("cache hit for %s\n", ip)
+		body = it.Value
+	} else if resp, err := http.Get("http://ip-api.com/json/" + ip); err != nil {
+		err = fmt.Errorf("falied to fetch ip info: %s", err)
 	} else if body, err := ioutil.ReadAll(resp.Body); err != nil {
-		log.Fatal("falied to read http response ip info: %s %s", ip, err)
+		err = fmt.Errorf("falied to read resp body: %s", err)
 	} else {
-		if json.Unmarshal(body, &info); err != nil {
-			log.Fatal("falied to unmarshal ip info: %s %s", ip, err)
-		} else {
-			return
-		}
+		mc.Set(&memcache.Item{Key: ip, Value: body})
+	}
+	if json.Unmarshal(body, &info); err != nil {
+		err = fmt.Errorf("falied to unmarshal ip info: %s", err)
 	}
 	return
 }
 
+var mc = memcache.New("localhost:11211")
+
 func main() {
+	// mc := memcache.New("10.0.0.1:11211", "10.0.0.2:11211", "10.0.0.3:11212")
+
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		ip := scanner.Text()
-		info := ipInfo(ip)
-		fmt.Printf("%s\n", info)
+		if info, err := ipInfo(ip); err != nil {
+			log.Fatal("error getting info for %s: %s", ip, err)
+		} else {
+			fmt.Printf("%s\n", info)
+		}
 	}
 }
