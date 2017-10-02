@@ -35,8 +35,11 @@ if test -z "${API_KEY}"; then
     echo "no api key found in ${API_KEY_FN}"
     exit ${LINENO}
 fi
-PRE_URL="http://api.ipinfodb.com/v3/ip-city/?key=${API_KEY}"
 
+function ip_to_url	{
+	IP=$1 && shift
+	echo "http://ip-api.com/json/${IP}"
+}
 VERBOSE=${VERBOSE:-false}
 
 
@@ -79,8 +82,8 @@ function ip_get_cache	{
 
 function ip_get_network	{
     IP="${1}"
-    URL="${PRE_URL}&ip=${IP}"
-    RESP=$(curl -s "${URL}")
+    URL=$(ip_to_url ${IP})
+    RESP=$(curl -s ${URL})
     if ! test ${SLEEP_SECS} = 0; then
 	sleep ${SLEEP_SECS}
     fi
@@ -95,10 +98,11 @@ function ipdb_get_set	{
 function ip_get	{
     IP="${1}"
     RESP=$(ip_get_cache ${IP})
-    if test -z "${RESP}"; then
+    if test -z "${RESP}" || test -n "$(echo ${RESP} | grep 'ERROR')" ; then
 	test "${VERBOSE}" = true && echo "CACHE MISS. MAKING NETWORK REQUEST" >&2
 	RESP=$(ip_get_network ${IP})
 	ip_set "${IP}" "${RESP}"
+	echo "${RESP}"
     else
 	#test "${VERBOSE}" = true && echo "CACHE HIT" >&2
 	true
