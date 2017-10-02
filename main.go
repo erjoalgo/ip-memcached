@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/bradfitz/gomemcache/memcache"
 )
@@ -75,6 +76,8 @@ func ipInfo(ip string) (info IpInfo, err error) {
 			}
 			mc.Set(&memcache.Item{Key: ip, Value: body})
 		}
+		// sleep to avoid getting banned
+		time.Sleep(1 * time.Second)
 	}
 
 	if json.Unmarshal(body, &info); err != nil {
