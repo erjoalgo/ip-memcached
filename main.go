@@ -98,7 +98,7 @@ func main() {
 	flag.BoolVar(&verbose, "verbose", false, "verbose")
 	flag.BoolVar(&debug, "debug", false, "debug")
 	var mcPort int
-	flag.IntVar(&mcPort, "mcPort", 21201, "memcachedb port")
+	flag.IntVar(&mcPort, "mcPort", 11211, "memcachedb port")
 	flag.Parse()
 
 	mcaddr := fmt.Sprintf("127.0.0.1:%d", mcPort)
