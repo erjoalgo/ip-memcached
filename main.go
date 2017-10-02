@@ -63,6 +63,8 @@ func ipInfo(ip string) (info IpInfo, err error) {
 				log.Printf("cache hit for %s\n", ip)
 			}
 			body = it.Value
+		} else if debug {
+			log.Printf("memcached error: %s", err)
 		}
 	}
 
