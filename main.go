@@ -64,7 +64,7 @@ func ipInfo(ip string) (info IpInfo, err error) {
 			}
 			body = it.Value
 			// } else if _, ok := err.(*memcache.ErrCacheMiss); !ok {
-		} else if err != memcache.ErrCacheMiss {
+		} else if err != nil && err != memcache.ErrCacheMiss {
 			log.Printf("memcached non-cache miss error: %s", err)
 		}
 	}
