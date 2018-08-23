@@ -32,7 +32,8 @@ var example = `
   "query": "208.80.152.201"
 }`
 
-type IpInfo struct {
+// IPInfo stores info about an IP address
+type IPInfo struct {
 	Status      string // "success",
 	Country     string // "United States",
 	Countrycode string // "US",
@@ -54,7 +55,7 @@ var verbose bool
 var debug bool
 var mc *memcache.Client
 
-func ipInfo(ip string) (info IpInfo, err error) {
+func ipInfo(ip string) (info IPInfo, err error) {
 	// http://ip-api.com/json/208.80.152.201
 	var body []byte
 	if !skipCache && mc != nil {
@@ -116,7 +117,7 @@ func main() {
 	counts := make(map[string]int)
 	for scanner.Scan() {
 		ip := scanner.Text()
-		counts[ip] += 1
+		counts[ip]++
 	}
 	for ip, cnt := range counts {
 		if info, err := ipInfo(ip); err != nil {
