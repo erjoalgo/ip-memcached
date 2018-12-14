@@ -60,7 +60,7 @@ func ipInfo(ip string) (info IPInfo, err error) {
 	var body []byte
 	if !skipCache && mc != nil {
 		if it, err := mc.Get(ip); err == nil {
-			if verbose {
+			if debug {
 				log.Printf("cache hit for %s\n", ip)
 			}
 			body = it.Value
