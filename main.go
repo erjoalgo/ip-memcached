@@ -122,8 +122,10 @@ func main() {
 	for ip, cnt := range counts {
 		if info, err := ipInfo(ip); err != nil {
 			log.Fatal("error getting info for %s: %s", ip, err)
+		} else if !verbose {
+			fmt.Printf("(%d): %s\n", cnt, info)
 		} else {
-			fmt.Printf("%d: %s\n", cnt, info)
+			fmt.Printf("%s (%d): %s\n", ip, cnt, info)
 		}
 	}
 }
