@@ -1,17 +1,45 @@
-A self contained cli utility to query api.ipinfodb.com and provide IP info.
 
-    ln -s $(pwd)/ip-info-persistent.sh ~/bin/
+# Table of Contents
 
-    $ echo 45.55.140.195 | ip-info-persistent.sh
-    OK;;45.55.140.195;US;United States;New York;New York City;10013;40.7199;-74.005;-04:00
+1.  [Installation](#orgc5bd9f6)
+2.  [Usage](#org6e474b9)
+
+A simple command-line interface to `ip-api.com`
+
+
+<a id="orgc5bd9f6"></a>
+
+# Installation
+
+    go get -u github.com/erjoalgo/ip-memcached
+
+-   Optionally install `memcached`, e.g.
     
-    $ cut -f1 -d' ' /var/log/nginx/my-site.log | sort | uniq | ip-info-persistent.sh
-        
-    OK;;1.169.77.189;TW;Taiwan, Province of China;T'ai-wan;Taipei;10048;25.0478;121.532;+08:00
-    OK;;1.32.77.43;MY;Malaysia;Selangor;Seri Kembangan;43300;3.03333;101.717;+08:00
-    OK;;101.109.151.109;TH;Thailand;Chon Buri;Phatthaya;76130;12.9333;100.883;+07:00
-    OK;;101.226.33.205;TW;Taiwan, Province of China;T'ai-wan;Douliu;640;23.7094;120.543;+08:00
-    OK;;101.226.51.226;CN;China;Shanghai;Shanghai;100032;31.2222;121.458;+08:00
-    OK;;103.250.70.6;BD;Bangladesh;Dhaka;Dhaka;1312;23.7104;90.4074;+07:00
-    OK;;103.250.71.207;BD;Bangladesh;Dhaka;Tungi;4212;23.89;90.4058;+07:00
+        $ apt-get install memcached
+
+
+<a id="org6e474b9"></a>
+
+# Usage
+
+    $ echo 8.8.8.8 | ip-memcached
+    (1): { United States US   Mountain View     Level 3 Communications  AS15169 Google LLC }
+
+    $ echo 34.214.135.69 | ip-memcached -verbose
+    34.214.135.69 (1): { United States US   Portland     Amazon.com, Inc.  AS16509 Amazon.com, Inc. }
+
     
+    $ cut -f1 -d' ' /var/log/nginx/access.log | sort | uniq | ip-memcached 
+    1: { China CN   Guangzhou     China Mobile Communications Corporation  AS56040 China Mobile Communications Corporation }
+    1: { Taiwan TW   Fenjihu     HINET  AS3462 Chunghwa Telecom Co., Ltd. }
+    1: { Pakistan PK   Rawalpindi     PTCL  AS45595 Pakistan Telecommuication company limited }
+    1: { France FR   Gravelines     OVH SAS  AS16276 OVH SAS }
+    1: { Taiwan TW   Fenjihu     HINET  AS3462 Chunghwa Telecom Co., Ltd. }
+    1: { United Kingdom GB   London (Hammersmith and Fulham)     TalkTalk  AS9105 Tiscali UK Limited }
+    1: { China CN   Guangzhou     China Mobile communications corporation  AS9808 China Mobile }
+    1: { United States US   Brooklyn     AT&T Services  AS7018 AT&T Services, Inc. }
+    1: { France FR   Roubaix     OVH  AS16276 OVH SAS }
+    1: { Germany DE   Garching bei München     Leibniz-Rechenzentrum  AS12816 Leibniz-Rechenzentrum }
+    1: { Malaysia MY   Kuala Lumpur (Taman Bukit Pantai)     TMnet  AS4788 Tmnet, Telekom Malaysia Bhd. }
+    1: { China CN   Huangpu Qu     CNC Group CHINA169 Shanghai Province Network  AS17621 China Unicom Shanghai network }
+
